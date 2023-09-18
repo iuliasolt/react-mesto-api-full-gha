@@ -1,0 +1,4 @@
+.card__like_active {
+  background: url(../../../../images/union.svg) center no-repeat;
+  opacity: 1;
+}

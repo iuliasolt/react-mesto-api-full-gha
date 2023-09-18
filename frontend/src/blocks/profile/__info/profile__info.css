@@ -1,0 +1,16 @@
+.profile__info {
+  display: grid;
+  grid-template-areas:
+    'name edit'
+    'job .';
+  gap: 10px 18px;
+}
+
+
+@media screen and (max-width: 500px) {
+  .profile__info {
+    gap: 10px 10px;
+    padding: 20px 0 0 0;
+
+  }
+}

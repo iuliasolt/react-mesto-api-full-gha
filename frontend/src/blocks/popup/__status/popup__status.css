@@ -1,0 +1,8 @@
+.popup__status {
+    width: 120px;
+    height: 120px;
+    display: block;
+    margin: auto;
+    padding-top: 60px;
+    padding-bottom: 32px;
+}
