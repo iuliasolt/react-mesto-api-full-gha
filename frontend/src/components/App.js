@@ -34,13 +34,37 @@ function App() {
   const [popupTitle, setPopupTitle] = useState("");
   const navigate = useNavigate();
 
+
+  useEffect(() => {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      auth
+        .getContent(jwt)
+        .then((res) => {
+          if (res) {
+            setIsLoggedIn(true);
+            setEmailName(res.data.email);
+          }
+        })
+        .catch((err) => {
+          console.log(`Не удалось получить токен: ${err}`);
+        });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isLoggedIn === true) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
+
   function onRegister(email, password) {
     auth
       .register(email, password)
       .then(() => {
         setPopupImage(success);
         setPopupTitle("Вы успешно зарегистрировались!");
-        navigate("/sign-in");
+        navigate("/signin");
       })
       .catch(() => {
         setPopupImage(fail);
@@ -65,43 +89,22 @@ function App() {
       });
   }
 
-  useEffect(() => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
-      auth
-        .getContent(jwt)
-        .then((res) => {
-          if (res) {
-            setIsLoggedIn(true);
-            setEmailName(res.data.email);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isLoggedIn === true) {
-      navigate("/");
-    }
-  }, [isLoggedIn, navigate]);
-
   /*Рендер и отображение карточек на странице*/
   useEffect(() => {
-    setIsLoading(true);
-
-    Promise.all([api.getDataUser(), api.getInitialCards()])
+    if (isLoggedIn === true) {
+      Promise.all([api.getDataUser(), api.getInitialCards()])
       .then(([profileInfo, card]) => {
         setCurrentUser(profileInfo);
         setCards(card);
       })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+      .catch(() => {
+        setPopupImage(fail);
+        setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+        handleInfoTooltip();
+      });
+      //.finally(() => setIsLoading(false));
+    }
+  }, [isLoggedIn]);
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -238,7 +241,7 @@ function App() {
   function handleSignOut() {
     setIsLoggedIn(false);
     setEmailName(null);
-    navigate("/sign-in");
+    navigate("/signin");
     localStorage.removeItem("jwt");
   }
 
@@ -248,20 +251,20 @@ function App() {
         <div className="page__content">
           <Routes>
             <Route
-              path="/sign-in"
+              path="/signin"
               element={
                 <>
-                  <Header title="Регистрация" route="/sign-up" />
+                  <Header title="Регистрация" route="/signup" />
                   <Login onLogin={onLogin} />
                 </>
               }
             />
 
             <Route
-              path="/sign-up"
+              path="/signup"
               element={
                 <>
-                  <Header title="Вoйти" route="/sign-in" />
+                  <Header title="Вoйти" route="/signin" />
                   <Register onRegister={onRegister} />
                 </>
               }
@@ -297,7 +300,7 @@ function App() {
 
             <Route
               path="*"
-              element={<Navigate to={isLoggedIn ? "/" : "/sign-in"} />}
+              element={<Navigate to={isLoggedIn ? "/" : "/signin"} />}
             />
           </Routes>
           <EditProfilePopup

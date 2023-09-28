@@ -57,10 +57,10 @@ function Register(props) {
         </button>
       </form>
       <p className="login__text">
-        Уже зарегистрированы?{" "}
-        <Link to="/sign-in" className="login__link">
+        Уже зарегистрированы?
+        <Link to="/signin" className="login__link">
           Войти
-        </Link>{" "}
+        </Link>
       </p>
     </section>
   );
