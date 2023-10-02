@@ -27,8 +27,10 @@ app.get('/crash-test', () => {
 app.use(requestLogger);
 
 app.use(cookieParser());
-app.use(errorLogger);
 app.use(router);
+
+app.use(errorLogger);
+
 app.use(errors());
 app.use(handelError);
 

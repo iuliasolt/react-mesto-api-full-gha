@@ -38,7 +38,7 @@
 
 ## Ссылки на проект
 
-IP-адрес 51.250.67.165
+IP 51.250.67.165
 
 Frontend https://iuliasolt.nomoredomainsrocks.ru
 

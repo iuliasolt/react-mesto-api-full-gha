@@ -9,7 +9,7 @@ const createCard = (req, res, next) => {
   const owner = req.user._id;
   cardModel
     .create({ name, link, owner })
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.status(200).send(card))
     .catch((e) => {
       if (e instanceof mongoose.Error.ValidationError) {
         return next(new BadRequest('Переданы некорректные данные при создании карточки'));
@@ -21,7 +21,9 @@ const createCard = (req, res, next) => {
 const getCard = (req, res, next) => {
   cardModel
     .find({})
-    .then((cards) => res.status(200).send({ data: cards }))
+    .then((cards) => {
+      res.status(200).send(cards);
+    })
     .catch(next);
 };
 
@@ -38,7 +40,7 @@ const deleteCard = (req, res, next) => {
     })
     .then(({ resObj, card }) => {
       if (!resObj.deletedCount) return Promise.reject(new Error('Не удалять'));
-      res.status(200).send({ data: card });
+      res.status(200).send(card);
       return null;
     })
     .catch((e) => {
@@ -61,7 +63,7 @@ const likeCard = (req, res, next) => {
     )
     .orFail()
     .then((card) => {
-      res.status(200).send({ data: card });
+      res.status(200).send(card);
     })
     .catch((e) => {
       if (e instanceof mongoose.Error.DocumentNotFoundError) {
@@ -82,7 +84,7 @@ const dislikeCard = (req, res, next) => {
       { new: true },
     )
     .orFail()
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.status(200).send(card))
     .catch((e) => {
       if (e instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFound('Карточки с переданным _id не существует'));
