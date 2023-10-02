@@ -16,7 +16,7 @@ export default class Api {
   _getHeaders() {
     const jwt = localStorage.getItem("jwt");
     return {
-      "Authorization": `Bearer ${jwt}`,
+      'Authorization': `Bearer ${jwt}`,
       ...this._headers,
     };
   }
@@ -112,6 +112,6 @@ export const api = new Api({
     baseUrl: "https://api.iuliasolt.nomoredomainsrocks.ru",
     headers: {
         //authorization: "0b764e67-5e2a-419b-ae24-cb0da79c917b",
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
     },
 });

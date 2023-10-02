@@ -43,7 +43,7 @@ function App() {
         .then((res) => {
           if (res) {
             setIsLoggedIn(true);
-            setEmailName(res.user.email);
+            setEmailName(res.data.email);
           }
         })
         .catch((err) => {
