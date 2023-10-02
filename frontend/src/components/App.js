@@ -91,7 +91,6 @@ function App() {
 
   /*Рендер и отображение карточек на странице*/
   useEffect(() => {
-    setIsLoading(true);
     if (isLoggedIn === true) {
       Promise.all([api.getDataUser(), api.getInitialCards()])
       .then(([profileInfo, card]) => {
@@ -102,8 +101,7 @@ function App() {
         setPopupImage(fail);
         setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
         handleInfoTooltip();
-      })
-      .finally(() => setIsLoading(false));
+      });
     }
   }, [isLoggedIn]);
 
