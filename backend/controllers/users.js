@@ -11,7 +11,7 @@ const getUsers = (req, res, next) => {
   userModel
     .find({})
     .then((users) => {
-      res.status(200).send({ data: users });
+      res.status(200).send(users);
     })
     .catch(next);
 };
@@ -19,7 +19,7 @@ const getUsers = (req, res, next) => {
 const getUserById = (req, res, next) => {
   userModel.findById(req.params.userId)
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch((e) => {
       if (e instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFound('Пользователь по указанному id не найден'));
@@ -40,7 +40,7 @@ const updateProfile = (req, res, next) => {
       { new: true, runValidators: true },
     )
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch((e) => {
       if (e instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFound('Пользователь по указанному id не найден'));
@@ -64,7 +64,7 @@ const updateAvatar = (req, res, next) => {
       { new: true, runValidators: true },
     )
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch((e) => {
       if (e instanceof mongoose.Error.ValidationError) {
         return next(new BadRequest('Переданы некорректные данные'));
@@ -109,7 +109,7 @@ const login = (req, res, next) => {
 const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   userModel.findById(userId)
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch(next);
 };
 

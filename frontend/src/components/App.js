@@ -171,27 +171,20 @@ function App() {
         setCurrentUser(newUser);
         closeAllPopups();
       })
-      .catch(() => {
-        setPopupImage(fail);
-        setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
-        handleInfoTooltip();
-    })
+      .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
   }
 
-  function handleUpdateAvatar(data) {
+  function handleUpdateAvatar({ avatar }) {
     api
-      .setUserAvatar(data)
-      .then((newAvatar) => {
-        setCurrentUser(newAvatar);
+      .setUserAvatar({
+        avatar: avatar,
+      })
+      .then((res) => {
+        setCurrentUser(res);
         closeAllPopups();
       })
-      .catch(() => {
-        closeAllPopups();
-        setPopupImage(fail);
-        setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
-        handleInfoTooltip();
-      })
+      .catch((err) => console.log(err))
       .finally(() => setIsLoading(false));
   }
 
