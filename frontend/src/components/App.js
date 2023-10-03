@@ -53,7 +53,7 @@ function App() {
   const handleSignOut = useCallback(() => {
     localStorage.removeItem("jwt");
     setIsLoggedIn(false);
-    setEmailName(null);
+    setEmailName("");
     navigate("/signin");
   },[navigate])
 
@@ -62,25 +62,24 @@ function App() {
     if (jwt) {
       auth
         .getContent(jwt)
-        .then((res) => {
-          if (res) {
+        .then((data) => {
+          if (data) {
+            setEmailName(data.email);
             setIsLoggedIn(true);
-            setEmailName(res.data.email);
           }
         })
         .catch((err) => {
-          handleSignOut();
+          handleSignOut()
           console.log(`Не удалось получить токен: ${err}`);
         });
       }
 }, [handleSignOut]);
 
-useEffect(() => {
-  tokenCheck();
-}, [tokenCheck])
+  useEffect(() => {
+    tokenCheck();
+  }, [tokenCheck])
 
   
-
   function onRegister(email, password) {
     auth
       .register(email, password)
@@ -105,7 +104,7 @@ useEffect(() => {
       .then((data) => {
         localStorage.setItem("jwt", data.token);
         setIsLoggedIn(true);
-        setEmailName("");
+        setEmailName("email");
         navigate("/");
       })
       .catch(() => {
@@ -115,25 +114,21 @@ useEffect(() => {
       });
   }
 
- const handleEditAvatarClick = useCallback(() => {
+  function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
-  }, [])
-
-  const handleEditProfileClick = useCallback(() => {
+  }
+  function handleEditProfileClick() {
     setIsEditProfilePopupOpen(true);
-  }, [])
-
-  const handleAddPlaceClick = useCallback(() => {
+  }
+  function handleAddPlaceClick() {
     setIsAddPlacePopupOpen(true);
-  }, [])
-
-  const handleCardClick = useCallback((card) => {
+  }
+  function handleCardClick(card) {
     setSelectedCard(card);
-  }, [])
-
-  const handleInfoTooltip = useCallback(() => {
+  }
+  function handleInfoTooltip() {
     setInfoTooltip(true);
-  }, [])
+  }
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
