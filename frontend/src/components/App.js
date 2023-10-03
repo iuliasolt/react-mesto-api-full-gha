@@ -158,12 +158,14 @@ function App() {
   }
 
   const handleCardDelete = (card) => {
+    setIsLoading(true)
     api
       .deleteCard(card._id)
       .then(() => {
-        /* используя методы массива, создаем новый массив карточек newCards, где не будет карточки, которую мы только что удалили */
-        const newCard = cards.filter((c) => c._id !== card._id);
-        setCards(newCard);
+        setCards((cards) => 
+          cards.filter((c) => c._id !== card._id)
+      )
+      closeAllPopups();
       })
       .catch((err) => {
         console.log(err);
