@@ -7,17 +7,17 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new AuthError('Необходима авторизация');
+    return next(new AuthError('Необходима авторизация'));
   }
 
   const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
-    payload = jwt.verify(token, `${NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key'}`);
-    req.user = payload; // записываем payload в объект
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key');
   } catch (err) {
-    throw new AuthError('Необходима авторизация');
+    return next(new AuthError('Необходима авторизация'));
   }
-  next();
+  req.user = payload; // записываем payload в объект
+  return next();
 };

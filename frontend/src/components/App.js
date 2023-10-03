@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Footer from "./Footer.js";
@@ -27,15 +27,37 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(localStorage.getItem("jwt")));
   const [emailName, setEmailName] = useState(null);
   const [infoTooltip, setInfoTooltip] = useState(false);
   const [popupImage, setPopupImage] = useState("");
   const [popupTitle, setPopupTitle] = useState("");
   const navigate = useNavigate();
 
-
+  /*Рендер и отображение карточек на странице*/
   useEffect(() => {
+    setIsLoading(true);
+    isLoggedIn && Promise.all([api.getDataUser(), api.getInitialCards()])
+      .then(([profileInfo, card]) => {
+        setCurrentUser(profileInfo);
+        setCards(card);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setIsLoading(false)
+      });
+  }, [isLoggedIn]);
+
+  const handleSignOut = useCallback(() => {
+    localStorage.removeItem("jwt");
+    setIsLoggedIn(false);
+    setEmailName(null);
+    navigate("/signin");
+  },[navigate])
+
+  const tokenCheck = useCallback(() => {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
       auth
@@ -43,32 +65,36 @@ function App() {
         .then((res) => {
           if (res) {
             setIsLoggedIn(true);
-            setEmailName(res.user.email);
+            setEmailName(res.data.email);
           }
         })
         .catch((err) => {
+          handleSignOut();
           console.log(`Не удалось получить токен: ${err}`);
         });
-    }
-  }, []);
+      }
+}, [handleSignOut]);
 
-  useEffect(() => {
-    if (isLoggedIn === true) {
-      navigate("/");
-    }
-  }, [isLoggedIn, navigate]);
+useEffect(() => {
+  tokenCheck();
+}, [tokenCheck])
+
+  
 
   function onRegister(email, password) {
     auth
       .register(email, password)
-      .then(() => {
+      .then((data) => {
+        if(data) {
         setPopupImage(success);
         setPopupTitle("Вы успешно зарегистрировались!");
-        navigate("/signin");
+        navigate("/signin")
+      }
       })
-      .catch(() => {
+      .catch((err) => {
         setPopupImage(fail);
         setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+        console.log(err);
       })
       .finally(handleInfoTooltip);
   }
@@ -76,10 +102,10 @@ function App() {
   function onLogin(email, password) {
     auth
       .login(email, password)
-      .then((res) => {
-        localStorage.setItem("jwt", res.token);
+      .then((data) => {
+        localStorage.setItem("jwt", data.token);
         setIsLoggedIn(true);
-        setEmailName(email);
+        setEmailName("");
         navigate("/");
       })
       .catch(() => {
@@ -89,37 +115,25 @@ function App() {
       });
   }
 
-  /*Рендер и отображение карточек на странице*/
-  useEffect(() => {
-    if (isLoggedIn === true) {
-      Promise.all([api.getDataUser(), api.getInitialCards()])
-      .then(([user, cards]) => {
-        setCurrentUser(user.user);
-        setCards(cards.reverse());
-      })
-      .catch(() => {
-        setPopupImage(fail);
-        setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
-        handleInfoTooltip();
-      });
-    }
-  }, [isLoggedIn]);
-
-  function handleEditAvatarClick() {
+ const handleEditAvatarClick = useCallback(() => {
     setIsEditAvatarPopupOpen(true);
-  }
-  function handleEditProfileClick() {
+  }, [])
+
+  const handleEditProfileClick = useCallback(() => {
     setIsEditProfilePopupOpen(true);
-  }
-  function handleAddPlaceClick() {
+  }, [])
+
+  const handleAddPlaceClick = useCallback(() => {
     setIsAddPlacePopupOpen(true);
-  }
-  function handleCardClick(card) {
+  }, [])
+
+  const handleCardClick = useCallback((card) => {
     setSelectedCard(card);
-  }
-  function handleInfoTooltip() {
+  }, [])
+
+  const handleInfoTooltip = useCallback(() => {
     setInfoTooltip(true);
-  }
+  }, [])
 
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
@@ -133,12 +147,8 @@ function App() {
             state.map((c) => (c._id === card._id ? newCard : c))
           );
         })
-        .catch(() => {
-          setPopupImage(fail);
-          setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
-          handleInfoTooltip();
-        });
-      } else {
+        .catch((err) => console.log(err));
+    } else {
       api
         .deleteLike(card._id)
         .then((newCard) => {
@@ -146,12 +156,10 @@ function App() {
             state.map((c) => (c._id === card._id ? newCard : c))
           );
         })
-        .catch(() => {
-          setPopupImage(fail);
-          setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
-          handleInfoTooltip();
+        .catch((err) => {
+          console.log(err);
         });
-      }
+    }
   }
 
   const handleCardDelete = (card) => {
@@ -243,12 +251,7 @@ function App() {
     infoTooltip,
   ]);
 
-  function handleSignOut() {
-    setIsLoggedIn(false);
-    setEmailName(null);
-    navigate("/signin");
-    localStorage.removeItem("jwt");
-  }
+
 
   return (
     <CurrentUserContext.Provider value={currentUser}>

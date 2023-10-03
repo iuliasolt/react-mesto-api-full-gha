@@ -1,7 +1,7 @@
 export default class Api {
   constructor(options) {
       this._baseUrl = options.baseUrl;
-      this._headers = options.headers;
+    //  this._headers = options.headers;
   }
 
   /*Проверка ошибки*/
@@ -13,105 +13,117 @@ export default class Api {
     return Promise.reject(`Ошибка: ${res.status}`);
 }
 
-  _getHeaders() {
-    const jwt = localStorage.getItem("jwt");
+  /*_getHeaders() {
+    const jwt = localStorage.getItem('jwt');
     return {
       'Authorization': `Bearer ${jwt}`,
       ...this._headers,
     };
-  }
+  }*/
   
   /*Загрузка карточек с сервера*/
   getInitialCards() {
       return fetch(`${this._baseUrl}/cards`, {
-        headers: this._getHeaders(),
-      }).then((res) => { 
-        return this._handleResponse(res);
-      });
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+          'Content-Type': 'application/json',
+        },
+      }).then(this._handleResponse)
   }
 
+  /*Функция получения данных пользователя на сервер*/
   getDataUser() {
       return fetch(`${this._baseUrl}/users/me`, {
-          headers: this._getHeaders(),
-      }).then((res) => { 
-        return this._handleResponse(res);
-      });
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+          'Content-Type': 'application/json',
+        },
+      }).then(this._handleResponse)
   }
 
+  /*Функция передачи данных пользователя на сервер*/
   setUserData(data) {
       return fetch(`${this._baseUrl}/users/me`, {
-          method: "PATCH",
-          headers: this._getHeaders(),
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
               name: data.name,
               about: data.about,
           }),
-      }).then((res) => { 
-        return this._handleResponse(res);
-      });
+      }).then(this._handleResponse);
   }
 
   setUserAvatar(data) {
       return fetch(`${this._baseUrl}/users/me/avatar`, {
-          method: "PATCH",
-          headers: this._getHeaders(),
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
               avatar: data.avatar,
           }),
-      }).then((res) => { 
-        return this._handleResponse(res);
-      });
+      }).then(this._handleResponse);
   }
 
   /*Добавление новой карточки*/
-  addNewCard(/*name, link*/ user) {
+  addNewCard(/*name, link*/ data) {
       return fetch(`${this._baseUrl}/cards`, {
-          method: "POST",
-          headers: this._getHeaders(),
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
-              name: user.name,
-              link: user.link,
+              name: data.name,
+              link: data.link,
           }),
-      }).then((res) => { 
-        return this._handleResponse(res);
-      });
+      }).then(this._handleResponse);
   }
 
   /*Удаление карточки*/
   deleteCard(cardId) {
       return fetch(`${this._baseUrl}/cards/${cardId}`, {
-          method: "DELETE",
-          headers: this._getHeaders(),
-      }).then((res) => { 
-        return this._handleResponse(res);
-      });
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+            'Content-Type': 'application/json',
+          },
+        }).then(this._handleResponse)
   }
 
   setLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
-        method: "PUT",
-        headers: this._getHeaders(),
-    }).then((res) => { 
-        return this._handleResponse(res);
-      });
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+          'Content-Type': 'application/json',
+        },
+      }).then(this._handleResponse)
 }
 
   /*Удаление лайков*/
   deleteLike(cardId) {
       return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
-          method: "DELETE",
-          headers: this._getHeaders(),
-      }).then((res) => { 
-        return this._handleResponse(res);
-      });
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+            'Content-Type': 'application/json',
+          },
+        }).then(this._handleResponse)
   }
 }
 /*Загрузка информации о пользователе с сервера*/
 export const api = new Api({
-    /*baseUrl: "https://mesto.nomoreparties.co/v1/cohort-68",*/
-    baseUrl: "https://api.iuliasolt.nomoredomainsrocks.ru",
-    headers: {
-        //authorization: "0b764e67-5e2a-419b-ae24-cb0da79c917b",
+    /*baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-68',*/
+    baseUrl: 'https://api.iuliasolt.nomoredomainsrocks.ru',
+    /*headers: {
+        //authorization: '0b764e67-5e2a-419b-ae24-cb0da79c917b',
         'Content-Type': 'application/json',
-    },
+    },*/
 });
