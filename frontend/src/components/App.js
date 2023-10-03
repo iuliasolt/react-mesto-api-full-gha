@@ -9,6 +9,7 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 import { api } from "../utils/api.js";
 import EditProfilePopup from "./EditProfilePopup.js";
 import EditAvatarPopup from "./EditAvatarPopup.js";
+import DeleteCardPopup from "./DeleteCardPopup.js";
 import AddPlacePopup from "./AddPlacePopup.js";
 import Register from "./Register.js";
 import Login from "./Login.js";
@@ -24,6 +25,7 @@ function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState([]);
@@ -69,7 +71,7 @@ function App() {
           }
         })
         .catch((err) => {
-          handleSignOut()
+          handleSignOut();
           console.log(`Не удалось получить токен: ${err}`);
         });
       }
@@ -126,6 +128,11 @@ function App() {
   function handleCardClick(card) {
     setSelectedCard(card);
   }
+  function handleCardDeleteClick(card) {
+    setSelectedCard(card);
+    setIsDeletePopupOpen(true);
+  }
+
   function handleInfoTooltip() {
     setInfoTooltip(true);
   }
@@ -158,14 +165,12 @@ function App() {
   }
 
   const handleCardDelete = (card) => {
-    setIsLoading(true)
     api
       .deleteCard(card._id)
       .then(() => {
-        setCards((cards) => 
-          cards.filter((c) => c._id !== card._id)
-      )
-      closeAllPopups();
+        /* используя методы массива, создаем новый массив карточек newCards, где не будет карточки, которую мы только что удалили */
+        const newCard = cards.filter((c) => c._id !== card._id);
+        setCards(newCard);
       })
       .catch((err) => {
         console.log(err);
@@ -225,6 +230,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setSelectedCard(null);
     setInfoTooltip(false);
+    setIsDeletePopupOpen(false);
   }
 
   useEffect(() => {
@@ -294,7 +300,7 @@ function App() {
                     onAddPlace={handleAddPlaceClick}
                     onCardClick={handleCardClick}
                     onCardLike={handleCardLike}
-                    onCardDelete={handleCardDelete}
+                    onCardDelete={handleCardDeleteClick}
                     cards={cards}
                     isLoading={isLoading}
                   />
@@ -321,6 +327,15 @@ function App() {
             onClose={closeAllPopups}
             onAddPlace={handleAddPlaceSubmit}
           />
+
+          <DeleteCardPopup
+            isOpen={isDeletePopupOpen}
+            onCloseClick={handlePopupCloseClick}
+            onClose={closeAllPopups}
+            onSubmit={handleCardDelete}
+            card={selectedCard}
+          />
+
 
           <EditAvatarPopup
             isOpen={isEditAvatarPopupOpen}
