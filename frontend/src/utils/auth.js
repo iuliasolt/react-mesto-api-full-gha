@@ -18,7 +18,7 @@ export const register = (email, password) => {
     },
     body: JSON.stringify({ email, password }),
   }).then(handleResponse);
-};
+}
 
 export const login = (email, password) => {
   return fetch(`${BASE_URL}/signin`, {
@@ -29,7 +29,7 @@ export const login = (email, password) => {
     },
     body: JSON.stringify({ email, password }),
   }).then(handleResponse);
-};
+}
 
 export const getContent = (jwt) => {
   return fetch(`${BASE_URL}/users/me`, {
@@ -40,4 +40,4 @@ export const getContent = (jwt) => {
       Authorization: `Bearer ${jwt}`,
     },
   }).then(handleResponse);
-};
+}

@@ -43,7 +43,7 @@ function App() {
         .then((res) => {
           if (res) {
             setIsLoggedIn(true);
-            setEmailName(res.data.email);
+            setEmailName(res.user.email);
           }
         })
         .catch((err) => {
@@ -93,9 +93,9 @@ function App() {
   useEffect(() => {
     if (isLoggedIn === true) {
       Promise.all([api.getDataUser(), api.getInitialCards()])
-      .then(([profileInfo, card]) => {
-        setCurrentUser(profileInfo);
-        setCards(card);
+      .then(([user, cards]) => {
+        setCurrentUser(user.user);
+        setCards(cards.reverse());
       })
       .catch(() => {
         setPopupImage(fail);
@@ -133,8 +133,12 @@ function App() {
             state.map((c) => (c._id === card._id ? newCard : c))
           );
         })
-        .catch((err) => console.log(err));
-    } else {
+        .catch(() => {
+          setPopupImage(fail);
+          setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+          handleInfoTooltip();
+        });
+      } else {
       api
         .deleteLike(card._id)
         .then((newCard) => {
@@ -142,10 +146,12 @@ function App() {
             state.map((c) => (c._id === card._id ? newCard : c))
           );
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          setPopupImage(fail);
+          setPopupTitle("Что-то пошло не так! Попробуйте ещё раз.");
+          handleInfoTooltip();
         });
-    }
+      }
   }
 
   const handleCardDelete = (card) => {

@@ -64,13 +64,13 @@ export default class Api {
   }
 
   /*Добавление новой карточки*/
-  addNewCard(/*name, link*/ data) {
+  addNewCard(/*name, link*/ user) {
       return fetch(`${this._baseUrl}/cards`, {
           method: "POST",
           headers: this._getHeaders(),
           body: JSON.stringify({
-              name: data.name,
-              link: data.link,
+              name: user.name,
+              link: user.link,
           }),
       }).then((res) => { 
         return this._handleResponse(res);
