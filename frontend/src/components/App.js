@@ -202,14 +202,10 @@ function App() {
       .finally(() => setIsLoading(false));
   }
 
-  function handleAddPlaceSubmit({ name, link }) {
+  function handleAddPlaceSubmit(data) {
     api
-      .addNewCard({
-        name: name,
-        link: link,
-      })
-      .then((data) => {
-        const newCard = data;
+      .addNewCard(data)
+      .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
