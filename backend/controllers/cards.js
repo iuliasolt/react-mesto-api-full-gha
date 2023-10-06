@@ -32,29 +32,18 @@ const deleteCard = (req, res, next) => {
   cardModel.findById(req.params.cardId)
     .orFail()
     .then((card) => {
-      if (!card.owner.equals(req.user._id)) {
+      const owner = card.owner.toString();
+      if (owner !== req.user._id) {
         throw new ForbiddenError('В доступе отказано');
-      }
-      cardModel.deleteOne(card)
-        .orFail()
-        .then(() => {
-          res.status(200).send({ message: 'Карточка удалена' });
-        })
-        .catch((e) => {
-          if (e instanceof mongoose.Error.DocumentNotFoundError) {
-            next(new NotFound('Карточки с переданным _id не существует'));
-          } else {
-            next(e);
-          }
-        });
-    })
-    .catch((e) => {
-      if (e instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFound('Карточки с переданным _id не существует'));
       } else {
-        next(e);
+        cardModel.findByIdAndDelete(req.params.cardId)
+          .then(() => {
+            res.status(200).send({ message: `Карточка ${card} удалена` });
+          })
+          .catch(next);
       }
-    });
+    })
+    .catch(next);
 };
 
 const likeCard = (req, res, next) => {
