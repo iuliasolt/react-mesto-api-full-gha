@@ -9,22 +9,19 @@ const createCard = (req, res, next) => {
   const owner = req.user._id;
   cardModel
     .create({ name, link, owner })
-    .then((card) => {
-      res.status(200).send(card);
-    })
+    .then((card) => res.status(200).send({ data: card }))
     .catch((e) => {
       if (e instanceof mongoose.Error.ValidationError) {
-        next(new BadRequest('Переданы некорректные данные при создании карточки'));
-      } else {
-        next(e);
+        return next(new BadRequest('Переданы некорректные данные при создании карточки'));
       }
+      return next(e);
     });
 };
 
 const getCard = (req, res, next) => {
   cardModel
     .find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch(next);
 };
 
@@ -32,28 +29,26 @@ const deleteCard = (req, res, next) => {
   cardModel.findById(req.params.cardId)
     .orFail()
     .then((card) => {
-      if (!card.owner.equals(req.user._id)) {
-        throw new ForbiddenError('В доступе отказано');
+      if (String(card.owner) !== req.user._id) {
+        return next(new ForbiddenError('В доступе отказано'));
       }
-      cardModel.deleteOne(card)
-        .orFail()
-        .then(() => {
-          res.status(200).send({ message: 'Карточка удалена' });
-        })
-        .catch((e) => {
-          if (e instanceof mongoose.Error.DocumentNotFoundError) {
-            next(new NotFound('Карточки с переданным _id не существует'));
-          } else {
-            next(e);
-          }
-        });
+      return cardModel.deleteOne({ _id: req.params.cardId })
+        .then((resObj) => ({ resObj, card }))
+        .catch(next);
+    })
+    .then(({ resObj, card }) => {
+      if (!resObj.deletedCount) return Promise.reject(new Error('Не удалять'));
+      res.status(200).send({ data: card });
+      return null;
     })
     .catch((e) => {
       if (e instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFound('Карточки с переданным _id не существует'));
-      } else {
-        next(e);
+        return next(new NotFound('Карточки с переданным _id не существует'));
       }
+      if (e instanceof mongoose.Error.CastError) {
+        return next(new BadRequest('Некорректный формат _id'));
+      }
+      return next(e);
     });
 };
 
@@ -66,16 +61,16 @@ const likeCard = (req, res, next) => {
     )
     .orFail()
     .then((card) => {
-      res.status(200).send(card);
+      res.status(200).send({ data: card });
     })
     .catch((e) => {
       if (e instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFound('Карточки с переданным _id не существует'));
-      } else if (e instanceof mongoose.Error.CastError) {
-        next(new BadRequest('Некорректный формат _id'));
-      } else {
-        next(e);
+        return next(new NotFound('Карточки с переданным _id не существует'));
       }
+      if (e instanceof mongoose.Error.CastError) {
+        return next(new BadRequest('Некорректный формат _id'));
+      }
+      return next(e);
     });
 };
 
@@ -87,17 +82,15 @@ const dislikeCard = (req, res, next) => {
       { new: true },
     )
     .orFail()
-    .then((card) => {
-      res.status(200).send(card);
-    })
+    .then((card) => res.status(200).send({ data: card }))
     .catch((e) => {
       if (e instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFound('Карточки с переданным _id не существует'));
-      } else if (e instanceof mongoose.Error.CastError) {
-        next(new BadRequest('Некорректный формат _id'));
-      } else {
-        next(e);
+        return next(new NotFound('Карточки с переданным _id не существует'));
       }
+      if (e instanceof mongoose.Error.CastError) {
+        return next(new BadRequest('Некорректный формат _id'));
+      }
+      return next(e);
     });
 };
 

@@ -32,7 +32,7 @@ export default class Api {
       }).then(this._handleResponse)
   }
 
-  /*Функция получения данных пользователя на сервер*/
+  /*Функция получения данных пользователя c сервер*/
   getDataUser() {
       return fetch(`${this._baseUrl}/users/me`, {
         method: 'GET',
