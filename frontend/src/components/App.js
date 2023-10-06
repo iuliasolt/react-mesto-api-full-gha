@@ -164,12 +164,12 @@ function App() {
     }
   }
 
-  const handleCardDelete = () => {
+  const handleCardDelete = (card) => {
     setIsLoading(true)
     api
-      .deleteCard(selectedCard._id)
+      .deleteCard(card._id)
       .then(() => {
-        setCards((cards) => cards.filter((c) => c.id !== selectedCard._id));
+        setCards((cards) => cards.filter((c) => c.id !== card._id));
         closeAllPopups();
       })
       .catch((err) => {

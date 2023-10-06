@@ -10,7 +10,7 @@ function Card(props) {
     isLiked && "card__like_active"
   }`;
 
-  const cardDeleteButtonClassName = `className="card__trash_hidden" ${
+  const cardDeleteButtonClassName = `card__trash_hidden ${
     isOwn && "card__trash"
   }`;
   function handleCardClick() {
