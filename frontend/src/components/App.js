@@ -164,13 +164,13 @@ function App() {
     }
   }
 
-  const handleCardDelete = (card) => {
+  const handleCardDelete = () => {
+    setIsLoading(true)
     api
-      .deleteCard(card._id)
+      .deleteCard(selectedCard._id)
       .then(() => {
-        /* используя методы массива, создаем новый массив карточек newCards, где не будет карточки, которую мы только что удалили */
-        const newCard = cards.filter((c) => c._id !== card._id);
-        setCards(newCard);
+        setCards((cards) => cards.filter((c) => c.id !== selectedCard._id));
+        closeAllPopups();
       })
       .catch((err) => {
         console.log(err);
