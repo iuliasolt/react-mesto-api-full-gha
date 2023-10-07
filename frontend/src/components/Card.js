@@ -10,9 +10,9 @@ function Card(props) {
     isLiked && "card__like_active"
   }`;
 
-  /*const cardDeleteButtonClassName = `card__trash_hidden ${
+  const cardDeleteButtonClassName = `card__trash_hidden ${
     isOwn && "card__trash"
-  }`;*/
+  }`;
   function handleCardClick() {
     props.onCardClick(props.card);
   }
@@ -29,7 +29,7 @@ function Card(props) {
       {isOwn && (
         <button
           type="button"
-          className="card__trash"
+          className={cardDeleteButtonClassName}
           onClick={handleDeleteClick}
           aria-label="Удаление"
         />
