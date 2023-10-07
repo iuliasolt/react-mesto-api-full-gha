@@ -31,7 +31,7 @@ const getCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   cardModel.findById(req.params.cardId)
     .orFail(() => {
-      throw new NotFound('Карточка с указанным id не найдена')
+      throw new NotFound('Карточка с указанным id не найдена');
     })
     .then((card) => {
       const owner = card.owner.toString();

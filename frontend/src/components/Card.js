@@ -4,15 +4,15 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 function Card(props) {
   const currentUser = React.useContext(CurrentUserContext);
   const isOwn = props.card.owner._id === currentUser._id;
-  const isLiked = props.card.likes.some((i) => i._id === currentUser._id);
+  const isLiked = props.card.likes.some(i => i._id === currentUser._id);
 
   const cardLikeButtonClassName = `card__like ${
     isLiked && "card__like_active"
   }`;
 
-  const cardDeleteButtonClassName = `card__trash_hidden ${
+  /*const cardDeleteButtonClassName = `card__trash_hidden ${
     isOwn && "card__trash"
-  }`;
+  }`;*/
   function handleCardClick() {
     props.onCardClick(props.card);
   }
@@ -29,7 +29,7 @@ function Card(props) {
       {isOwn && (
         <button
           type="button"
-          className={cardDeleteButtonClassName}
+          className="card__trash"
           onClick={handleDeleteClick}
           aria-label="Удаление"
         />
