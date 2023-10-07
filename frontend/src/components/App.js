@@ -224,7 +224,7 @@ function App() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
-    //setSelectedCard(null);
+    setSelectedCard(null);
     setInfoTooltip(false);
     setIsDeletePopupOpen(false);
   }
