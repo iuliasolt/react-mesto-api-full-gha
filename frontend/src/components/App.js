@@ -29,7 +29,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState([]);
-  const [cardRemove, setCardRemove] = useState({});
+  const [cardDelete, setCardDelete] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(localStorage.getItem("jwt")));
   const [emailName, setEmailName] = useState(null);
   const [infoTooltip, setInfoTooltip] = useState(false);
@@ -52,6 +52,59 @@ function App() {
         setIsLoading(false)
       });
   }, [isLoggedIn]);
+
+  
+  function handleEditAvatarClick() {
+    setIsEditAvatarPopupOpen(true);
+  }
+  function handleEditProfileClick() {
+    setIsEditProfilePopupOpen(true);
+  }
+  function handleAddPlaceClick() {
+    setIsAddPlacePopupOpen(true);
+  }
+  function handleCardClick(card) {
+    setSelectedCard(card);
+  }
+  function handleCardDeleteClick(card) {
+    setIsDeletePopupOpen(true);
+    setCardDelete(card);
+  }
+
+  function handleInfoTooltip() {
+    setInfoTooltip(true);
+  }
+
+  function closeAllPopups() {
+    setIsProfilePopupOpen(false);
+    setIsEditAvatarPopupOpen(false);
+    setIsEditProfilePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setSelectedCard(null);
+    setInfoTooltip(false);
+    setIsDeletePopupOpen(false);
+  }
+
+  useEffect(() => {
+    
+    function handleEsc(evt) {
+      if (evt.key === "Escape") {
+        closeAllPopups();
+      }
+    }
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+    };
+  
+}, [
+  isProfilePopupOpen,
+  isAddPlacePopupOpen,
+  isEditAvatarPopupOpen,
+  isEditProfilePopupOpen,
+  selectedCard,
+  infoTooltip,
+]);
 
   const handleSignOut = useCallback(() => {
     localStorage.removeItem("jwt");
@@ -117,27 +170,6 @@ function App() {
       });
   }
 
-  function handleEditAvatarClick() {
-    setIsEditAvatarPopupOpen(true);
-  }
-  function handleEditProfileClick() {
-    setIsEditProfilePopupOpen(true);
-  }
-  function handleAddPlaceClick() {
-    setIsAddPlacePopupOpen(true);
-  }
-  function handleCardClick(card) {
-    setSelectedCard(card);
-  }
-  function handleCardDeleteClick(card) {
-    setCardRemove(card);
-    setIsDeletePopupOpen(true);
-  }
-
-  function handleInfoTooltip() {
-    setInfoTooltip(true);
-  }
-
   function handleCardLike(card) {
     const isLiked = card.likes.some(i => i === currentUser._id);
       api
@@ -154,9 +186,9 @@ function App() {
   const handleCardDelete = () => {
     setIsLoading(true)
     api
-      .deleteCard(cardRemove._id)
+      .deleteCard(cardDelete._id)
       .then(() => {
-        setCards((cards) => cards.filter((c) => c.id !== cardRemove._id));
+        setCards((cards) => cards.filter((c) => c.id !== cardDelete._id));
         closeAllPopups();
       })
       .catch((err) => {
@@ -205,39 +237,6 @@ function App() {
       closeAllPopups();
     }
   }
-
-  function closeAllPopups() {
-    setIsProfilePopupOpen(false);
-    setIsEditAvatarPopupOpen(false);
-    setIsEditProfilePopupOpen(false);
-    setIsAddPlacePopupOpen(false);
-    setSelectedCard(null);
-    setInfoTooltip(false);
-    setIsDeletePopupOpen(false);
-  }
-
-  useEffect(() => {
-    
-      function handleEsc(evt) {
-        if (evt.key === "Escape") {
-          closeAllPopups();
-        }
-      }
-      document.addEventListener("keydown", handleEsc);
-      return () => {
-        document.removeEventListener("keydown", handleEsc);
-      };
-    
-  }, [
-    isProfilePopupOpen,
-    isAddPlacePopupOpen,
-    isEditAvatarPopupOpen,
-    isEditProfilePopupOpen,
-    selectedCard,
-    infoTooltip,
-  ]);
-
-
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -315,8 +314,9 @@ function App() {
             isOpen={isDeletePopupOpen}
             onCloseClick={handlePopupCloseClick}
             onClose={closeAllPopups}
-            onSubmit={handleCardDelete}
-            card={selectedCard}
+            onDelete={handleCardDelete}
+            isLoading={isLoading}
+
           />
 
 
