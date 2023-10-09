@@ -29,6 +29,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState([]);
+  const [cardRemove, setCardRemove] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(localStorage.getItem("jwt")));
   const [emailName, setEmailName] = useState(null);
   const [infoTooltip, setInfoTooltip] = useState(false);
@@ -129,7 +130,7 @@ function App() {
     setSelectedCard(card);
   }
   function handleCardDeleteClick(card) {
-    setSelectedCard(card);
+    setCardRemove(card);
     setIsDeletePopupOpen(true);
   }
 
@@ -150,12 +151,12 @@ function App() {
         })
   }
 
-  const handleCardDelete = (card) => {
+  const handleCardDelete = () => {
     setIsLoading(true)
     api
-      .deleteCard(card._id)
+      .deleteCard(cardRemove._id)
       .then(() => {
-        setCards((cards) => cards.filter((c) => c.id !== card._id));
+        setCards((cards) => cards.filter((c) => c.id !== cardRemove._id));
         closeAllPopups();
       })
       .catch((err) => {

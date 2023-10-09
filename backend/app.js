@@ -1,5 +1,5 @@
 require('dotenv').config();
-
+const rateLimit = require('express-rate-limit');
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
@@ -14,10 +14,9 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-const limiter = require('express-rate-limit')({
-  windowMs: 200,
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
   max: 100,
-  message: 'Превышено количество запросов',
 });
 
 app.use(limiter);

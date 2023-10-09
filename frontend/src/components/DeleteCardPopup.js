@@ -14,7 +14,7 @@ function DeleteCardPopup(props) {
           onSubmit={handleSubmit}
           name={"delete"}
           title={"Подтверждения удаления"}
-         buttonText={"Подтверждаю"}
+          buttonText={"Подтверждаю"}
       />
     );
 }
